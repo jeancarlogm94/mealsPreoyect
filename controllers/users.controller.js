@@ -79,7 +79,16 @@ const getAllUserOrders = catchAsync(async (req, res, next) => {
 
   const orders = await Order.findAll({
     where: { userId: sessionUser.id },
-    order: [['id', 'ASC']],
+    attributes: ['id', 'mealId', 'totalPrice', 'quantity', 'status'],
+    include: [
+      {
+        model: Meals,
+        attributes: ['name', 'price'],
+        include: [
+          { model: Restaurants, attributes: ['name', 'address', 'rating'] },
+        ],
+      },
+    ],
   });
 
   if (!orders) {
@@ -93,9 +102,9 @@ const getAllUserOrders = catchAsync(async (req, res, next) => {
 });
 const getUserOrderById = catchAsync(async (req, res, next) => {
   const { sessionUser } = req;
-  const { id } = req.body;
+  const { id } = req.params;
   const orders = await Order.findAll({
-    where: { id },
+    where: { id, userId: sessionUser.id },
     order: [['id', 'ASC']],
   });
 

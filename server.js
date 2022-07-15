@@ -1,18 +1,20 @@
 const dotenv = require('dotenv');
-const { app } = require('./app');
 
 // Utils
+const { app } = require('./app');
+const { initModels } = require('./models/initModels');
 const { db } = require('./utils/db.utils');
 dotenv.config({ path: './config.env' });
 
-// Server auth
+// server auth
 db.authenticate()
   .then(() => {
     console.log('db auth');
   })
   .catch((e) => console.log(e));
 
-// Establish model's relations
+// Models relations
+initModels();
 
 // Server sync
 db.sync()
@@ -21,6 +23,6 @@ db.sync()
   })
   .catch((e) => console.log(e));
 
-app.listen(4000, () => {
+app.listen(process.env.PORT, () => {
   console.log('Server On');
 });

@@ -2,7 +2,7 @@ const express = require('express');
 
 const usersRouter = express.Router();
 
-// Contollers
+// Controllers
 const {
   createUser,
   login,
@@ -10,7 +10,7 @@ const {
   deleteUser,
   getAllUserOrders,
   getUserOrderById,
-} = require('../controllers/users.controllers');
+} = require('../controllers/users.controller');
 
 // Middlewares
 const {
@@ -19,8 +19,9 @@ const {
 } = require('../middlewares/auth.middleware');
 const {
   createUserValidators,
-  userExist,
 } = require('../middlewares/validations.middleware');
+
+const { userExist } = require('../middlewares/userExist.middleware');
 
 // Endpoints
 usersRouter.post('/signup', createUserValidators, createUser);

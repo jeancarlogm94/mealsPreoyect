@@ -1,4 +1,4 @@
-const { Review } = require('/models/review.model');
+const { Review } = require('../models/review.model');
 const { AppError } = require('../utils/appError.utils');
 const { catchAsync } = require('../utils/catchAsync.utils');
 

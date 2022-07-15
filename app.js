@@ -1,26 +1,33 @@
 const express = require('express');
 
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const compression = require('compression');
+const morgan = require('morgan');
+const path = require('path');
+
 // Routers
 const { restaurantRouter } = require('./routes/restaurants.routes');
 const { usersRouter } = require('./routes/users.routes');
+const { mealsRouter } = require('./routes/meals.routes');
+const { ordersRouter } = require('./routes/orders.routes');
 
 // Global error controller
-const { globalErrorHandler } = require('./controllers/error.controller');
+const { globalErrorHandler } = require('./controllers/error.controllers');
 
-// Utils
-const { AppError } = require('./utils/appError.utils');
+//Utils
+const { AppError } = require('./utils/appError.utils.js');
 
-// Init express app
+// Init app
 const app = express();
 
-// Enable incoming JSON
 app.use(express.json());
 
-// Limit the number of requests that can be accepted to our server
+// Limiter
 const limiter = rateLimit({
   max: 10000,
-  windowMs: 60 * 60 * 1000, // 1 hr
-  message: 'Number of requests have been exceeded',
+  windowMs: 60 * 60 * 1000,
+  message: 'Number of request have been exceded',
 });
 
 app.use(limiter);
@@ -38,9 +45,11 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('combined'));
 }
 
-// Define endpoints
+// Endpoints
 app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/restaurants', restaurantRouter);
+app.use('/api/v1/meals', mealsRouter);
+app.use('/api/v1/orders', ordersRouter);
 
 // Handle incoming unknown routes to the server
 app.all('*', (req, res, next) => {
@@ -52,6 +61,7 @@ app.all('*', (req, res, next) => {
   );
 });
 
+// GobalErrorHandler
 app.use(globalErrorHandler);
 
 module.exports = { app };

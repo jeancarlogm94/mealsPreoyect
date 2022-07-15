@@ -1,24 +1,7 @@
 const { body, validationResult } = require('express-validator');
 
-//modules
-const { User } = require('../models/user.model');
-
-//utils
+// Utils
 const { AppError } = require('../utils/appError.utils');
-const { catchAsync } = require('../utils/catchAsync.utils');
-
-const userExist = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
-  const user = await User.findOne({ where: { id } });
-
-  if (!user) {
-    return next(new AppError('User not found', 404));
-  }
-
-  req.user = user;
-
-  next();
-});
 
 const checkResult = (req, res, next) => {
   const errors = validationResult(req);
@@ -44,4 +27,43 @@ const createUserValidators = [
   checkResult,
 ];
 
-module.exports = { createUserValidators, userExist };
+const createRestaurantValidators = [
+  body('name').notEmpty().withMessage('This field cannot be empty'),
+  body('address').notEmpty().withMessage('This field cannot be empty'),
+  body('rating')
+    .notEmpty()
+    .withMessage('This field cannot be empty')
+    .isNumeric()
+    .withMessage('This field must containt a number'),
+];
+
+const createMealsValidators = [
+  body('name').notEmpty().withMessage('This field cannot be empty'),
+  body('price')
+    .notEmpty()
+    .withMessage('This field cannot be empty')
+    .isNumeric()
+    .withMessage('This field must containt a number'),
+];
+
+const createOrderValidator = [
+  body('mealId')
+    .notEmpty()
+    .withMessage('This field cannot be empty')
+    .isNumeric()
+    .withMessage('This field must containt a number'),
+  ,
+  body('quantity')
+    .notEmpty()
+    .withMessage('This field cannot be empty')
+    .isNumeric()
+    .withMessage('This field must containt a number'),
+  checkResult,
+];
+
+module.exports = {
+  createUserValidators,
+  createMealsValidators,
+  createRestaurantValidators,
+  createOrderValidator,
+};

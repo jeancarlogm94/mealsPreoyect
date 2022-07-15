@@ -1,10 +1,10 @@
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 
-//models
+// Models
 const { User } = require('../models/user.model');
 
-//utils
+// Utils
 const { catchAsync } = require('../utils/catchAsync.utils');
 const { AppError } = require('../utils/appError.utils');
 
@@ -26,7 +26,7 @@ const protectSession = catchAsync(async (req, res, next) => {
 
   const decoded = await jwt.verify(token, process.env.JWT_SECRET);
 
-  const user = await Users.findOne({
+  const user = await User.findOne({
     where: { id: decoded.id, status: 'active' },
   });
 
@@ -39,7 +39,7 @@ const protectSession = catchAsync(async (req, res, next) => {
 });
 
 const verifyUserAccount = (req, res, next) => {
-  const { sessionUser, user } = req;
+  const { sessionUser, user, review } = req;
 
   if (sessionUser.id !== user.id) {
     return next(new AppError('You do not own this account', 403));
@@ -48,4 +48,31 @@ const verifyUserAccount = (req, res, next) => {
   next();
 };
 
-module.exports = { protectSession, verifyUserAccount };
+const verifySameSession = (req, res, next) => {
+  const { sessionUser, order } = req;
+  console.log(order);
+
+  if (sessionUser.id !== order.userId) {
+    return next(new AppError('You do not have access for this action', 403));
+  }
+  next();
+};
+
+const verifyUserRol = (req, res, next) => {
+  const { sessionUser } = req;
+
+  if (sessionUser.rol !== 'admin') {
+    return next(
+      new AppError('you dont have permission to complete this action', 403)
+    );
+  }
+
+  next();
+};
+
+module.exports = {
+  protectSession,
+  verifyUserAccount,
+  verifyUserRol,
+  verifySameSession,
+};

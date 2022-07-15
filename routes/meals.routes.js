@@ -2,25 +2,33 @@ const express = require('express');
 
 const mealsRouter = express.Router();
 
-// Cotrollers
+// Middleware
+const { mealExist } = require('../middlewares/mealExist.middleware');
+const {
+  protectSession,
+  verifyUserRol,
+} = require('../middlewares/auth.middleware');
+const {
+  restaurantExist,
+} = require('../middlewares/restaurantExist.middleware');
+
 const {
   createMeal,
   allMeals,
   mealsById,
   updateMeal,
   deletMeal,
-} = require('../controllers/meals.controllers');
+} = require('../controllers/meals.controller');
 
-// Middlewares
-const { mealExist } = require('../middlewares/mealExist.middleware');
-
-// Endpoints
+// Include rest info
 mealsRouter.get('/', allMeals);
-mealsRouter.get('/:id', mealsById);
+mealsRouter.get('/:id', mealExist, mealsById);
 
-//protected End Points
-mealsRouter.post('/:id', createMeal);
-mealsRouter.patch('/:id', updateMeal);
-mealsRouter.delete('/:id', deletMeal);
+// Protected End Points
+
+mealsRouter.use(protectSession);
+mealsRouter.post('/:id', restaurantExist, createMeal);
+mealsRouter.patch('/:id', mealExist, verifyUserRol, updateMeal);
+mealsRouter.delete('/:id', mealExist, verifyUserRol, deletMeal);
 
 module.exports = { mealsRouter };

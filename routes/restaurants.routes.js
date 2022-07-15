@@ -2,7 +2,19 @@ const express = require('express');
 
 const restaurantRouter = express.Router();
 
-// Cotrollers
+// Middleware
+const {
+  restaurantExist,
+} = require('../middlewares/restaurantExist.middleware');
+const { reviewExist } = require('../middlewares/reviewExist.middleware');
+const {
+  protectSession,
+  verifyUserRol,
+  verifyUserAccount,
+  verifySameSession,
+} = require('../middlewares/auth.middleware');
+
+// Constrollers
 const {
   newRestaurant,
   allRestaurant,
@@ -12,28 +24,40 @@ const {
   newReviewRestaurant,
   updateReview,
   deleteReview,
-} = require('../controllers/restaurants.controllers');
-
-// Middlewares
-const {
-  restaurantExist,
-} = require('../middlewares/restaurantExist.middleware');
-const { reviewExist } = require('../middlewares/reviewExist.middleware');
+} = require('../controllers/restaurants.controller');
+const { userExist } = require('../middlewares/userExist.middleware');
 
 // Endpoints
 // Restaurants
 restaurantRouter.get('/', allRestaurant);
 restaurantRouter.get('/:id', restaurantExist, restaurantById);
 
-restaurantRouter.post('reviews/:restaurantId', newReviewRestaurant);
+// Protected End points
 
-// Protected endpoints
+restaurantRouter.use(protectSession);
+
 restaurantRouter.post('/', newRestaurant);
-restaurantRouter.patch('/:id', restaurantExist, updateRestaurant);
-restaurantRouter.delete('/:id', restaurantExist, deletRestaurant);
 
 // Restaurants reviews
-restaurantRouter.patch('reviews/:id', reviewExist, updateReview);
-restaurantRouter.delete('/reviews/:id', reviewExist, deleteReview);
+restaurantRouter.post('/reviews/:restaurantId', newReviewRestaurant);
+restaurantRouter.patch(
+  '/reviews/:id',
+  reviewExist,
+  verifySameSession,
+  updateReview
+);
+restaurantRouter.delete(
+  '/reviews/:id',
+  reviewExist,
+  verifySameSession,
+  deleteReview
+);
+
+// Restaurant functions
+restaurantRouter
+  .use('/:id', restaurantExist)
+  .route('/:id')
+  .patch(verifyUserRol, updateRestaurant)
+  .delete(verifyUserRol, deletRestaurant);
 
 module.exports = { restaurantRouter };
