@@ -35,6 +35,7 @@ const createRestaurantValidators = [
     .withMessage('This field cannot be empty')
     .isNumeric()
     .withMessage('This field must containt a number'),
+  checkResult,
 ];
 
 const createMealsValidators = [
@@ -44,6 +45,7 @@ const createMealsValidators = [
     .withMessage('This field cannot be empty')
     .isNumeric()
     .withMessage('This field must containt a number'),
+  checkResult,
 ];
 
 const createOrderValidator = [
@@ -52,12 +54,10 @@ const createOrderValidator = [
     .withMessage('This field cannot be empty')
     .isNumeric()
     .withMessage('This field must containt a number'),
-  ,
   body('quantity')
     .notEmpty()
     .withMessage('This field cannot be empty')
-    .isNumeric()
-    .withMessage('This field must containt a number'),
+    .isNumeric(),
   checkResult,
 ];
 

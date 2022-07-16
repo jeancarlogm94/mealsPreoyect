@@ -9,7 +9,8 @@ const {
   editOrderStatus,
   cancelOrder,
 } = require('../controllers/orders.controller');
-//middlewares
+
+// Middlewares
 const {
   protectSession,
   verifySameSession,
@@ -23,11 +24,17 @@ const {
   createOrderValidator,
 } = require('../middlewares/validations.middleware');
 
-//endpoints
+// Endpoints
 
 ordersRouter.use(protectSession);
 
-ordersRouter.post('/', mealExist, restaurantExist, createAOrder);
+ordersRouter.post(
+  '/',
+  createOrderValidator,
+  mealExist,
+  restaurantExist,
+  createAOrder
+);
 ordersRouter.get('/me', getAllOrders);
 ordersRouter
   .route('/:id')
